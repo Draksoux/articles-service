@@ -1,0 +1,38 @@
+package com.microservice.articlesservice.web.dao;
+
+import com.microservice.articlesservice.web.model.Article;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.ArrayList;
+
+@Repository
+public class ArticleDaoImpl implements ArticleDao {
+    public static List<Article> articles= new ArrayList<>();
+    static {
+        articles.add(new Article(1, new String("Ordinateur portable"), 350, 250));
+        articles.add(new Article(2, new String("Aspirateur Robot"), 500, 200));
+        articles.add(new Article(3, new String("Table de Ping Pong"), 750, 500));
+    }
+
+    @Override
+    public List<Article>findAll() {
+        return articles;
+    }
+
+    @Override
+    public Article findById(int id) {
+        for (Article article : articles) {
+            if(article.getId() == id){
+                return article;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Article save(Article article) {
+        articles.add(article);
+        return article;
+    }
+}
