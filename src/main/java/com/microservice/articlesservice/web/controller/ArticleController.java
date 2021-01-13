@@ -10,6 +10,7 @@ import com.microservice.articlesservice.web.dto.ArticleDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class ArticleController {
 
     // Retourne tous les articles
     @ApiOperation(value = "Récupère tous les articles")
-    @RequestMapping(value="/Articles", method = RequestMethod.GET)
+    @RequestMapping(value = "/Articles", method = RequestMethod.GET)
     public MappingJacksonValue listeArticles() {
         List<Article> articles = articleDao.findAll();
         SimpleBeanPropertyFilter monFiltre =
@@ -48,7 +49,7 @@ public class ArticleController {
     public Article afficherUnArticle(@PathVariable int id) {
         Article article = articleDao.findById(id);
 
-        if (article==null) throw new ArticleIntrouvableException("L'articke avec l'id " + id + " est INTROUVABLE.");
+        if (article == null) throw new ArticleIntrouvableException("L'articke avec l'id " + id + " est INTROUVABLE.");
         return article;
     }
 
@@ -65,7 +66,7 @@ public class ArticleController {
     @GetMapping(value = "/test/articles/like/{recherche}")
     public List<Article> testeDeRequetes(@PathVariable String
                                                  recherche) {
-        return articleDao.findByNomLike("%"+recherche+"%");
+        return articleDao.findByNomLike("%" + recherche + "%");
     }
 
     // Ajoute un article et renvoit le bon code (201)
@@ -86,14 +87,14 @@ public class ArticleController {
 
     // supprime un article
     @ApiOperation(value = "Supprime un article de la base de données")
-    @DeleteMapping (value = "/Articles/{id}")
+    @DeleteMapping(value = "/Articles/{id}")
     public void supprimerArticle(@PathVariable int id) {
         articleDao.deleteById(id);
     }
 
     // modifie un article
     @ApiOperation(value = "Modifie un article de la base de données")
-    @PutMapping (value = "/Articles")
+    @PutMapping(value = "/Articles")
     public void updateArticle(@RequestBody Article article) {
         articleDao.save(article);
     }
@@ -102,7 +103,7 @@ public class ArticleController {
     @ApiOperation(value = "Récuprère tous les articles dont le prix est supérieur au prix passé en paramètre")
     @GetMapping(value = "/test/articles/query/{prix}")
     public List<Article> chercherUnArticleCher(@PathVariable int
-                                                 prix) {
+                                                           prix) {
         return articleDao.chercherUnArticleCher(prix);
     }
 
@@ -113,12 +114,19 @@ public class ArticleController {
     public List<ArticleDTO> calculerMargeArticle() {
         List<Article> articles = articleDao.findAll();
         List<ArticleDTO> result = new ArrayList<>();
-        for (Article article : articles ) {
+        for (Article article : articles) {
             result.add(new ArticleDTO(article));
         }
         return result;
     }
 
-
+    // Retourne la marge pour chaque article
+    @ApiOperation(value = "Récupère tous les articles triés par ordre alphabétique")
+    @RequestMapping(value = "/Articles/sorted", method =
+            RequestMethod.GET)
+    public List<Article> trierArticlesParOrdreAlphabetique() {
+        List<Article> articles = articleDao.findAll(Sort.by("nom"));
+        return articles;
+    }
 
 }
